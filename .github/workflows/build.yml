@@ -34,9 +34,12 @@ jobs:
         shell: pwsh
         run: |
           pyinstaller davesbx-backend.spec --noconfirm
-          # Copy the built exe to the Tauri resources directory
           New-Item -ItemType Directory -Force -Path src-tauri/binaries
           Copy-Item dist/davesbx-backend.exe src-tauri/binaries/davesbx-backend-x86_64-pc-windows-msvc.exe
+
+      - name: Install Tauri CLI
+        run: |
+          npm install -g @tauri-apps/cli@latest
 
       - name: Install frontend dependencies
         run: |
@@ -44,14 +47,13 @@ jobs:
           npm install
 
       - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
+        shell: pwsh
+        run: |
+          npx tauri build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tauriScript: npx tauri build
-          # This will automatically create a GitHub Release with the installer
 
-      - name: Upload installer to release
+      - name: Upload installer to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v1.0.${{ github.run_number }}
@@ -63,10 +65,6 @@ jobs:
             - DAVESBX auto-generates a public URL and API key
             - The FastAPI backend starts automatically
             - No setup wizard — just open and use
-
-            ## Files
-            - **davesbx_*.exe** — NSIS installer (recommended)
-            - **davesbx_*.msi** — MSI installer
 
             Built from commit ${{ github.sha }}
           files: |
