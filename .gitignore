@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+src-tauri/target/
+src-tauri/binaries/
+__pycache__/
+*.pyc
+.env
+*.egg-info/
+dist/
+.venv/
+venv/
